@@ -1,0 +1,15 @@
+local TextChatService = game:GetService("TextChatService")
+local Players = game:GetService("Players")
+
+TextChatService.OnIncomingMessage = function(message)
+	local properties = Instance.new("TextChatMessageProperties")
+
+	if message.TextSource then
+		local player = Players:GetPlayerByUserId(message.TextSource.UserId)
+		if player then
+			properties.PrefixText = "<font color='#00aaff'>[" .. player.DisplayName .. "]</font>" .. player.Name .. ":"
+		end
+	end
+
+	return propertiess
+end
