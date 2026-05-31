@@ -1,15 +1,43 @@
 local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
 
-TextChatService.OnIncomingMessage = function(message)
-	local properties = Instance.new("TextChatMessageProperties")
+-- These closely match Roblox's default chat name color palette
+local COLORS = {
+	"#FF7474", -- red
+	"#FF9966", -- orange
+	"#FFD700", -- gold
+	"#7EC850", -- green
+	"#5AC8F5", -- light blue
+	"#A78BFA", -- purple
+	"#FF69B4", -- pink
+	"#4ECDC4", -- teal
+}
 
-	if message.TextSource then
-		local player = Players:GetPlayerByUserId(message.TextSource.UserId)
-		if player then
-			properties.PrefixText = "<font color='#00aaff'>[" .. player.DisplayName .. "]</font>" .. player.Name .. ":"
-		end
-	end
-
-	return propertiess
+local function getChatColor(userId)
+	return COLORS[(userId % #COLORS) + 1]
 end
+
+local function applyChat()
+	pcall(function()
+		TextChatService.OnIncomingMessage = function(message)
+			local properties = Instance.new("TextChatMessageProperties")
+			if message.TextSource then
+				local player = Players:GetPlayerByUserId(message.TextSource.UserId)
+				if player then
+					local color = getChatColor(player.UserId)
+					properties.PrefixText = "<font color='" .. color .. "'>[" .. player.DisplayName .. "]</font>" .. player.Name .. ":"
+				end
+			end
+			return properties
+		end
+	end)
+end
+
+applyChat()
+
+task.spawn(function()
+	while true do
+		task.wait(2)
+		applyChat()
+	end
+end)
